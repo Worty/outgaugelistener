@@ -4,7 +4,11 @@
 
 Library for receiving OutGauge pakets from simulators like BeamNG.drive®
 
-Also contains a test cli program which prints incoming packets in `./cli` (`go run main.go <listen ip> <listen udp port>`)
+Also contains a test cli program which prints incoming packets in [./cli/main.go](cli/main.go).
+
+run it: `go run main.go <listen ip> <listen udp port>`
+
+For information how setup the game checkout the [Wiki](https://wiki.beamng.com/OutGauge.html)
 
 ## Usage:
 
