@@ -2,7 +2,9 @@ package outgaugelistener
 
 import (
 	"fmt"
+	"net"
 	"testing"
+	"time"
 )
 
 var testData = [][]byte{
@@ -102,4 +104,62 @@ func TestParseData(t *testing.T) {
 		t.Fatal("expected error")
 	}
 
+}
+
+func TestReceiver(t *testing.T) {
+	l, err := NewListener(&net.UDPAddr{IP: net.ParseIP("127.0.0.1"), Port: 4444})
+	if err != nil {
+		t.Fatal(err)
+	}
+	ch := l.GetChannel()
+
+	send, err := net.Dial("udp", "127.0.0.1:4444")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer send.Close()
+	numOfSendPackets := len(testData)
+	numOfRecvPackets := 0
+	go func() {
+		for _, v := range testData {
+			send.Write(v)
+		}
+		time.Sleep(1 * time.Millisecond)
+		l.Close()
+	}()
+	for range ch {
+		numOfRecvPackets++
+	}
+	if numOfRecvPackets != numOfSendPackets {
+		t.Fatalf("expected %d packets, got %d", numOfSendPackets, numOfRecvPackets)
+	}
+
+}
+
+var result *OutGaugeData
+
+func BenchmarkParseData(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		result, _ = parseData(testData[0])
+	}
+}
+
+func BenchmarkReceiver(b *testing.B) {
+	l, err := NewListener(&net.UDPAddr{IP: net.ParseIP("127.0.0.1"), Port: 4444})
+	if err != nil {
+		b.Fatal(err)
+	}
+	defer l.Close()
+	ch := l.GetChannel()
+
+	send, err := net.Dial("udp", "127.0.0.1:4444")
+	if err != nil {
+		b.Fatal(err)
+	}
+	defer send.Close()
+
+	for n := 0; n < b.N; n++ {
+		send.Write(testData[0])
+		<-ch
+	}
 }

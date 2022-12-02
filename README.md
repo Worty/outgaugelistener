@@ -18,7 +18,8 @@ For information how setup the game checkout the [Wiki](https://wiki.beamng.com/O
     import (
         "github.com/worty/outgaugelistener"
     )
-    conn, err := outgaugelistener.Listen(&listenaddr, false)
+    // listenaddr:= net.UDPAddr{.....}
+    conn, err := outgaugelistener.Listen(&listenaddr)
     ...
     defer conn.Close()
     channel := conn.GetChannel()

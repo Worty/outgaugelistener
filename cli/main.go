@@ -26,7 +26,7 @@ func main() {
 		}
 	}
 	listenaddr := net.UDPAddr{IP: ip, Port: port}
-	conn, err := outgaugelistener.NewListener(&listenaddr, false)
+	conn, err := outgaugelistener.NewListener(&listenaddr)
 	if err != nil {
 		panic(err)
 	}
